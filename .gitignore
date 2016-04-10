@@ -1,0 +1,11 @@
+.Rproj.user
+*.Rproj
+.Rhistory
+.RData
+.Rbuildignore
+src/*.o
+src/*.so
+src/*.dll
+src/config.h
+src/Makevars
+src/Makevars.win

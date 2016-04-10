@@ -1,0 +1,20 @@
+FXT_PREFIX = fxt
+
+## from fxt/depend.mk
+#$(FXT_PREFIX)/src/comb/partition-gen.o: $(FXT_PREFIX)/src/comb/partition-gen.cc \
+# $(FXT_PREFIX)/src/comb/partition-gen.h $(FXT_PREFIX)/src/fxttypes.h $(FXT_PREFIX)/src/fxtio.h
+
+## from fxt/files.mk
+COMBOBJS = $(FXT_PREFIX)/src/comb/partition-gen.o 
+OBJS = $(COMBOBJS) init.o partitiongenR.o
+#SRC=$(OBJS:.o=.cc)
+
+## R package
+
+OBJECTS = $(OBJS) 
+
+PKG_CXXFLAGS = -Ifxt/src
+
+## end of Makevars.in
+
+

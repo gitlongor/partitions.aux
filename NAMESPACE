@@ -1,0 +1,8 @@
+export(restrictedpartition)
+export(nparts.atmost, nparts.exact, nparts.atmost.ubound)
+export(fpg)
+
+importFrom(gmp, as.bigz, div.bigz)
+
+useDynLib(partitions.aux, fpg=fxt_partition_gen, .registration=TRUE)
+
