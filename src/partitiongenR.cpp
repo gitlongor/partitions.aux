@@ -9,6 +9,12 @@
 
 extern "C" {
 
+/*
+ fixt_partition_gen is based on the partition-en in fxt library.
+ it finds all partitions with each part in "values" (excluding 0).
+ partitions with more than k parts are ignored.
+*/
+
 SEXP fxt_partition_gen(SEXP n, SEXP k, SEXP values, SEXP nout)
 {
 	SEXP out;

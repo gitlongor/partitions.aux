@@ -104,10 +104,29 @@ nparts.atmost.ubound = function(n, k, upper)
 
 restrictedpartition=function(n, k=n, values=seq_leng(n))
 {
-	n=as.integer(n); k=as.integer(k); values=unique(as.integer(values)); nout=as.integer(nparts.atmost.ubound(n,k,max(values)))
+
+	values=unique(as.integer(values)); 
+	values=values[values>0L & values<=n]; 
+	bounds=range(values)
+	if(bounds[1L] != 1L){
+		values=values - bounds[1L] + 1L 
+		n = n - k * bounds[1L]
+		max.v = diff(bounds)
+	}else max.v = bounds[2L]
+
+	n=as.integer(n); k=as.integer(k); 
+	
+	## nout is an upper bound on the number of partions
+	nout=as.integer(nparts.atmost.ubound(n,k,max.v))
+
+	## fgp is based on the partition-en in fxt library
+	## it finds all partitions with each part in "values" (excluding 0)
+	## partitions with more than k parts are ignored
 	ans=.Call(fpg, n, k, values, nout)
-	if(length(values)==n) return(ans)
-	ans[,.colSums(ans, k, nout)>0,drop=FALSE]
+	if(length(values)!=n) ans=ans[,.colSums(ans, k, nout)>0,drop=FALSE]
+	
+	if(bounds[1L] != 1L) ans=ans+bounds[1L]
+	ans
 }
 
 
