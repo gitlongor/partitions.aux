@@ -1,6 +1,6 @@
 nparts.atmost = function(n, k, include.zero=TRUE)
 {## this computes partitions::R(k,n,include.zero)
- ## i.e., the number of restricted partitions of n into at most k parts 
+ ## i.e., the number of restricted partitions of n into at most k parts
  ## reference: http://dlmf.nist.gov/26.9
 	pkn.table = matrix(NA_character_, n+1L, k+1L)
 	pkn.table[, 2L] = '1'
@@ -24,11 +24,11 @@ nparts.exact = function(n, k, include.zero=FALSE)
  ##			http://mathworld.wolfram.com/PartitionFunctionP.html
  ##			http://nvlpubs.nist.gov/nistpubs/jres/74B/jresv74Bn1p1_A1b.pdf
 	if(include.zero) return(Recall(n+k, k))
-	
+
 	if(n<=0L || k<=0L) return('0')
 	tmp = switch(k, 1L, n%/%2L, (n*n+3L)%/%12L)
 	if(!is.null(tmp)) return(as.character(tmp))
-	
+
 	pkn.table = matrix(NA_character_, n+1L, k+1L)
 	pkn.table[, 4L] = as.character(divq.bigz(as.bigz(seq_len(n+1L)-1L)^2+3L, 12L))
 	pkn.table[, 3L] = as.character(divq.bigz(seq_len(n+1L)-1L, 2L))
@@ -49,7 +49,7 @@ nparts.exact = function(n, k, include.zero=FALSE)
 }
 
 nparts.atmost.ubound = function(n, k, upper)
-{## this computes the number of restricted partitions of n into at most k parts 
+{## this computes the number of restricted partitions of n into at most k parts
  ## subject to the constraint that each part is at most "upper"
  ## reference: https://en.wikipedia.org/wiki/Partition_(number_theory)
 
@@ -57,7 +57,7 @@ nparts.atmost.ubound = function(n, k, upper)
 	pkn.table[, 2L] = '1'
 	pkn.table[, 1L] = '0'
 	pkn.table[1L, ] = '1'  # overwrite (1,1) position correctly
-	
+
 	recur.fctn = function(n, k, upper)
 	{
 		if(n < 0L) n = 0L
@@ -73,7 +73,7 @@ nparts.atmost.ubound = function(n, k, upper)
 }
 
 nparts.atmost.ubound = function(n, k, upper)
-{## this computes the number of restricted partitions of n into at most k parts 
+{## this computes the number of restricted partitions of n into at most k parts
  ## subject to the constraint that each part is at most "upper"
  ## reference: https://en.wikipedia.org/wiki/Partition_(number_theory)
 
@@ -81,7 +81,7 @@ nparts.atmost.ubound = function(n, k, upper)
 	#pkn.table[, 2L] = '1'
 	#pkn.table[, 1L] = '0'
 	#pkn.table[1L, ] = '1'  # overwrite (1,1) position correctly
-	
+
 	recur.fctn = function(n, k, upper)
 	{
 		if(n < 0L) return(0L) #?
@@ -106,12 +106,12 @@ restrictedpartition=function(n, k=n, values=seq_len(n))
 {
 
 	values=sort.int(unique(as.integer(values)), decreasing=FALSE);
-	values=values[values>0L & values<=n]; 
+	values=values[values>0L & values<=n];
 	bounds=range(values)
 	max.v = bounds[2L]
 
-	n=as.integer(n); k=as.integer(k); 
-	
+	n=as.integer(n); k=as.integer(k);
+
 	## nout is an upper bound on the number of partions
 	nout=as.integer(nparts.atmost.ubound(n,k,max.v))
 
@@ -128,10 +128,10 @@ restrictedpartitionR=function(n, k=n, values=seq_len(n))
 	maxv=max(values)
 	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
 	nsol=0L
-	
+
 	x=rep(n, nvals)
 	ct=cumct=rep(0L, nvals)
-	
+
 	recur.fctn=function(lev)
 	{
 		if(lev > nvals) return(NULL)
@@ -163,19 +163,19 @@ restrictedpartitionNR=function(n, k=n, values=seq_len(n))
 	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
 	nsol=0L
 	ncol.out=ncol(out)
-	
+
 	nextval=c(values[-1L],0L)
 	diffvals=values-nextval
 
 	x=rep(n, nvals)
 	minct=maxct=ct=rep(0L, nvals)
 	ct.allow=rep(k, nvals)
-	
+
 	newLev=TRUE; lev=2L; niter=0L
 	repeat{
 		niter=niter+1L
 		if(newLev){
-			while(values[lev]>x[lev-1L] && lev < nvals){ 
+			while(values[lev]>x[lev-1L] && lev < nvals){
 				## fast forward
 				ct[lev]=0L
 				maxct[lev]=minct[lev]=0L
@@ -191,10 +191,10 @@ restrictedpartitionNR=function(n, k=n, values=seq_len(n))
 		if (ct[lev] > minct[lev]){
 			ct[lev] = ct[lev]-1L
 		}else{
-			lev = lev - 1L 
+			lev = lev - 1L
 			if(lev == 1L) break else next
 		}
-			
+
 		x[lev]  =  x[lev-1L] - ct[lev] * values[lev]
 		ct.allow[lev] = ct.allow[lev-1L] - ct[lev]
 		if(x[lev] == 0L){
@@ -207,12 +207,12 @@ restrictedpartitionNR=function(n, k=n, values=seq_len(n))
 			lev=lev+1L
 			newLev=TRUE
 		}
-		
+
 		## fast rewind
 		while(ct[lev]==minct[lev] && !newLev && lev>1L) lev=lev-1L
 		if(lev==1L) break
 	}
-		
+
 	if(nsol<ncol(out)) out=out[, seq_len(nsol), drop=FALSE]
 	attr(out, 'niter')=niter
 	out
@@ -230,7 +230,7 @@ restrictedpartitionNRC=function(n, k=n, values=seq_len(n))
 	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
 	nsol=0L
 	ncol.out=ncol(out)
-	
+
 	nextval=c(values[-1L],0L)
 	diffvals=values-nextval
 
@@ -241,19 +241,64 @@ restrictedpartitionNRC=function(n, k=n, values=seq_len(n))
 	minct=rep(0L, nvals)
 	maxct=rep(0L, nvals)
 	ct.allow=rep(as.integer(k), nvals)
-	
-	
+
+
 	x; ct; minct; maxct; ct.allow;
-	values; nextval; diffvals; 
+	values; nextval; diffvals;
 	out; ncol.out
 	tmpans=.Call(restrParts,
 		x, ct, minct, maxct, ct.allow,
-		values, nextval, diffvals, 
+		values, nextval, diffvals,
 		out, ncol.out
 	)
 	#browser()
-		
-	if(isTRUE(tmpans)) out else tmpans 
+
+	if(isTRUE(tmpans)) out else tmpans
+}
+#debug(restrictedpartitionNR)
+#restrictedpartitionNR(15, 10, 1:7)
+#system.time(restrictedpartitionNR(80, 18, 1:9))
+
+
+restrictedpartitionZS1=function(n, k=n, upper=n)
+{  ## non-recursive implementation
+	values=c(0L, as.integer(seq(from=upper, to=1L, by=-1L)))
+	nvals=length(values)
+	maxv=max(values)
+	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
+	nsol=0L
+	ncol.out=ncol(out)
+
+	nextval=c(values[-1L],0L)
+	diffvals=values-nextval
+
+	x=rep(as.integer(n), nvals)
+	## do not write the following 3 lines together!
+	## they share the same mem location initially
+	ct=rep(0L, nvals)
+	minct=rep(0L, nvals)
+	maxct=rep(0L, nvals)
+	ct.allow=rep(as.integer(k), nvals)
+
+
+	x; ct; minct; maxct; ct.allow;
+	values; nextval; diffvals;
+	out; ncol.out
+	tmpans=as.vector(.Call(restrParts,
+		x, ct, minct, maxct, ct.allow,
+		values, nextval, diffvals,
+		out, 1L
+	))
+	startx=out[,1L]
+	startx=sort(startx[startx>0], decreasing=TRUE)
+	min1st = as.integer(ceiling(n/k))
+	tmpans2=.Call(ZS1,
+		as.integer(n), startx, as.integer(k),
+		out, ncol.out, min1st
+	)
+	#browser()
+
+	if(isTRUE(tmpans2)) out else tmpans2
 }
 #debug(restrictedpartitionNR)
 #restrictedpartitionNR(15, 10, 1:7)
@@ -266,21 +311,21 @@ if(FALSE){
 	recur.fctn.char=function(n, k)
 	{## a variant updating a global (char) table
 		if(!is.na(tmpans <- nparts.atmost.table[n+1L, k+1L])) return(as.bigz(tmpans))
-		
+
 		if(n<k){
 			ans=Recall(n, n)
-		}else 
+		}else
 			ans = Recall(n-k, k) + Recall(n, k-1L)
 		nparts.atmost.table[n+1L, k+1L] <<- as.character(ans)
 		return(ans)
 	}
-	
+
 	maxn=maxk=1000L
 	nparts.atmost.table=matrix(NA_character_, maxn+1L, maxk+1L)
 	nparts.atmost.table[, 2L]='1'
 	nparts.atmost.table[, 1L]='0'
 	nparts.atmost.table[1L, ]='1'  # overwrite (1,1) position correctly
-	
+
 	all.ind=as.matrix(expand.grid(seq_len(maxn+1L), seq_len(maxk+1L)))
 	ord=order(rowSums(all.ind), all.ind[,1L])
 	idx=all.ind[ord,]
@@ -297,21 +342,21 @@ if(FALSE){
 	## pre-compute a large nparts.exact table (0<=n<=1000; 0<=k<=1000)
 	library(gmp)
 	recur.fctn.char=function(n, k)
-	{	
+	{
 		if (k>n) return(0L)
 		if(!is.na(tmpans <- nparts.exact.table[n+1L, k+1L])) return(as.bigz(tmpans))
 		ans = Recall(n-1L, k-1L) + Recall(n-k, k)
 		nparts.exact.table[n+1L, k+1L] <<- as.character(ans)
 		ans
 	}
-	
+
 	maxn=maxk=1000L
 	nparts.exact.table=matrix(NA_character_, maxn+1L, maxk+1L)
 	nparts.exact.table[, 2L] = '1'
 	nparts.exact.table[, 1L] = '0'
 	nparts.exact.table[1L, ] = '0'
 	diag(nparts.exact.table) = '1'
-	
+
 	idx=as.matrix(expand.grid(seq_len(maxn+1L), seq_len(maxk+1L)))
 	for(i in seq_len(nrow(idx))){
 		if(idx[i, 1L] < idx[i, 2L]) {

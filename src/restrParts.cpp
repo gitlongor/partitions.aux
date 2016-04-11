@@ -87,7 +87,7 @@ nextiter:
 			R_CheckUserInterrupt();
 		}while(lev>0);
 	
-		Rprintf("niter=%d\n", niter);
+//		Rprintf("niter=%d\n", niter);
 		if(nsol < nsols){
 			SEXP ans = PROTECT(allocMatrix(INTSXP, ctallow[0], nsol));
 			memcpy(INTEGER(ans), INTEGER(outR), sizeof(int) * ctallow[0] * nsol);

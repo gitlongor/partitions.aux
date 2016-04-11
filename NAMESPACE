@@ -1,7 +1,11 @@
 importFrom(gmp, as.bigz, divq.bigz)
 
 export(nparts.atmost, nparts.atmost.ubound, nparts.exact)
-export(restrictedpartition, restrictedpartitionR, restrictedpartitionNR, restrictedpartitionNRC)
+export(
+	restrictedpartition, 
+	restrictedpartitionR, restrictedpartitionNR, restrictedpartitionNRC,
+	restrictedpartitionZS1
+)
 
 useDynLib(partitions.aux, fpg=fxt_partition_gen, .registration=TRUE)
 
