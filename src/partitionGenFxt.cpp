@@ -40,14 +40,15 @@ SEXP fxt_partition_gen(SEXP n, SEXP k, SEXP values, SEXP nout)
 	partition_gen pp((ulong) intn, (ulong) nvals, pv);
 
 	int pci; ulong checkCounts, cti, rowi,  nsols, unout=intnout;
-
+	ulong niter=0;
 //	for ( pp.next(); outp>INTEGER(tmpans); pp.next() ){
 	for ( nsols=0; nsols < unout;  ){
+		++niter;
 		pp.next();
 		for(checkCounts=0, pci=0; pci<nvals; ++pci) checkCounts += pp.pc_[pci];
 		R_CheckUserInterrupt();
 
-		if(checkCounts > ulk ) continue;
+		if (checkCounts > ulk ) continue;
 		if (checkCounts == 0) break;
 		++nsols;
 /*
@@ -67,6 +68,7 @@ SEXP fxt_partition_gen(SEXP n, SEXP k, SEXP values, SEXP nout)
 	}
 	delete[] pv;
 
+	Rprintf("niter=%d\n", niter);
 	ans=PROTECT(allocMatrix(INTSXP, intk, (int)nsols));
 	memcpy(INTEGER(ans), INTEGER(tmpans), sizeof(int) * intk * nsols);
 	
