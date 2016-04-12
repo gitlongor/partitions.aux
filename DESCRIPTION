@@ -1,7 +1,7 @@
 Package: partitions.aux
 Type: Package
 Title: Auxiliary Functions to Partitioned Package
-Version: 0.1.0-20160409
+Version: 0.1.0-20160412
 Author: Long Qu, Jorg Arndt
 Maintainer: Long Qu <long.qu@wright.edu>
 Description: More about what it does (maybe more than one line).

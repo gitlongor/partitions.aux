@@ -3,6 +3,8 @@
 // License: GNU General Public License version 3 or later,
 // see the file COPYING.txt in the main directory.
 
+#include <R.h> // for Rprintf to replace cout. Added by LQ.
+
 #include "comb/partition-gen.h"
 
 #include "fxtio.h"
@@ -33,8 +35,8 @@ partition_gen::print()  const
         for (ulong j=0; j<c; ++j)
         {
             if ( fq )  fq = 0;
-            else       cout << " +";
-            cout << setw(2) << v;
+            else  Rprintf(" +"); //     cout << " +";
+            Rprintf("%2d", v);   //cout << setw(2) << v;
         }
     }
 }
@@ -51,10 +53,13 @@ partition_gen::print2()  const
     for (ulong k=0; k<n_; ++k)
     {
         if ( fq )  fq = 0;
-        else       cout << " +";
-        cout << setw(2) << pc_[k];
-        if ( 0!=pc_[k] )  { cout << "*" << setw(2) << pv_[k]; }
-        else              cout << "   ";
+        else Rprintf(" +"); //      cout << " +";
+        Rprintf("%2d", pc_[k]); // cout << setw(2) << pc_[k];
+        if ( 0!=pc_[k] )  {
+			Rprintf("*%2d", pv_[k]);
+			//cout << "*" << setw(2) << pv_[k];
+		}
+        else  Rprintf("   "); //            cout << "   ";
     }
 }
 // -------------------------

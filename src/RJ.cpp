@@ -4,9 +4,14 @@
 #include <Rinternals.h>
 #include <R_ext/Utils.h>
 
+
+extern int isqrt(int); 
+#define MIN(x,y)  ((x)>(y) ? (y) : (x))
+
 extern "C" {
 
 #ifndef NOTHING
+// slightly rewritten version w/o goto statements and optimized for the case of z=0: 
 SEXP RJa0(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP numR, SEXP outR)
 /*
 	z=0: 0 for arbitrary choice of parts; 1 for distinct parts;
@@ -217,6 +222,105 @@ a1:
 end:
 	delete[] x;
 	delete[] y;
+
+	if(num < nsols){
+		*INTEGER(numR) = num;
+		SEXP ans = PROTECT(allocMatrix(INTSXP, n, num));
+		memcpy(INTEGER(ans), INTEGER(outR), sizeof(int) * n * num);
+		UNPROTECT(1);
+		return(ans);
+	}else {
+		SEXP ans=PROTECT(allocVector(LGLSXP, 1));
+		(LOGICAL(ans))[0] = 1;
+		UNPROTECT(1);
+		return(ans);
+	}
+}
+
+SEXP RJa0ss(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP ssR, SEXP numR, SEXP outR)
+/*
+	z=0: 0 for arbitrary choice of parts; 1 for distinct parts;
+	m: number to be partitioned;
+	l1: lower bound of each part;
+	l2: upper bound of each part;
+	n: number of parts;
+	ss: upper bound on sum of squares;
+	num: number of partitions to find;
+	out: preallocated space to hold results.
+*/
+{
+	//const int z=0; // z=*INTEGER(zR);
+	// in this case z=0; y[i]=l1; j=0 (except for loop idx);
+	int m; m=*INTEGER(mR);
+	int l1; l1=*INTEGER(l1R);
+	int l2; l2=*INTEGER(l2R);
+	int n; n=*INTEGER(nR);
+	int ss; ss=*INTEGER(ssR);
+	int nsols; nsols=*INTEGER(numR);
+	int *out; out=INTEGER(outR);
+	int num;
+
+	int *x, i, j; 
+	const int l1sq = l1 * l1, l12= 2 * l1;
+	int toAdd;
+	x=new int[n+1];
+	//y=new int[n+1];
+
+	num = 0; m -= n * l1 ; l2 -= l1;  // diff bounds
+	ss -= n * l1sq; 
+	if (m>=0 && m <= n*l2 && ss>=0 && ss <= n * l2 * l2){
+		for(i=1; i<=n; ++i) x[i] = l1; // init lower bnd;
+		
+		i=1; // l2 -= z*(n-1);
+		do{
+//a1:
+			// keep allocating current allowed upper bound
+			while (m > (toAdd = MIN(l2, isqrt(l1sq+ss)-l1)) && toAdd > 0) 
+			{// toAdd holds allowed upper bound
+			//while (ss >= (l2sq = l2 * (l2 + 2 * l1)) && m > l2)
+				m -= toAdd; ss -= toAdd * ( toAdd + l12); 
+				x[i++] = l1 + toAdd; 
+			}
+			//bool found=false;
+			if (toAdd != 0) {
+				x[i] = l1 + toAdd; ++num;  // last part;
+				//found = true;
+				for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];
+				if (num == nsols) break; // goto end;
+			
+				if (i<n && toAdd>1) { // possible to increase # of parts?
+								  // if so, do it;
+								  // but after this, no way to extend it w/o affecting decreasing order -- have to backtrack then.
+					// note that this never decrease ss: 
+					// original sum of squares at location i and i+1 is 
+					//		(l1+toAdd)^2 + l1^2; 
+					// new sum of squares at these 2 locations is 
+					//		(l1+toAdd-1)^2 + (l1+1)^2 = (original ss) -2*(toAdd-1).
+					ss += 2*x[i]-1; // ss=ss+x[i]^2-(x[i]-1)^2
+					m = 1; --x[i++]; x[i] = l1 + 1; 
+					++num;
+					for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];
+					if (num == nsols) break; //goto end;
+				}
+			}
+			for (j=i-1; j>=1; --j) { // backtracking
+				ss += 2*x[j] - 1; // ss + x[j]^2 - (x[j]-1)^2
+				l2 = x[j] - l1 - 1; ++m;  // go back to location j and consider the next smaller value;
+				if (m <= (n-j) * l2 // at most n-j full terms to allocate after location j
+				) { // is it possible for all >j locations to get a solution?
+					// this is not sufficient condition, but necessary.
+					x[j] = l1 + l2;
+					break; // goto a1;
+				}else{  // otherwise, keep going back
+					ss += (x[j]-1)*(x[j]-1) - l1sq; 
+					m += l2; x[i] = l1; i = j; // i always points to j's next location.  At the end: i=1.
+				}
+			}
+		}while(i>1);
+	}
+//end:
+	delete[] x;
+//	delete[] y;
 
 	if(num < nsols){
 		*INTEGER(numR) = num;
