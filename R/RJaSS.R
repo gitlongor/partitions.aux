@@ -1,3 +1,5 @@
+if(FALSE){
+# this is the R version for debugging purpose only
 RJa0ssR=function(m, l1=0L, l2=m, n=m, ss=m*m)
 {
 	m0=m=as.integer(m);
@@ -84,4 +86,5 @@ RJa0ssR=function(m, l1=0L, l2=m, n=m, ss=m*m)
 
 	out[,seq_len(num), drop=FALSE]
 }
-str(RJa0ssR(75,n=10,ss=1000))
+#str(RJa0ssR(75,n=10,ss=1000))
+}

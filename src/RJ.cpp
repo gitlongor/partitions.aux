@@ -275,20 +275,20 @@ SEXP RJa0ss(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP ssR, SEXP numR, SEXP outR
 		do{
 //a1:
 			// keep allocating current allowed upper bound
-			while (m > (toAdd = MIN(l2, isqrt(l1sq+ss)-l1)) && toAdd > 0) 
+			while (m > (toAdd = MIN(l2, isqrt(l1sq+ss)-l1)) && toAdd > 0 && i<n) 
 			{// toAdd holds allowed upper bound
 			//while (ss >= (l2sq = l2 * (l2 + 2 * l1)) && m > l2)
 				m -= toAdd; ss -= toAdd * ( toAdd + l12); 
 				x[i++] = l1 + toAdd; 
 			}
 			//bool found=false;
-			if (toAdd != 0) {
-				x[i] = l1 + toAdd; ++num;  // last part;
+			if (toAdd != 0 && i<=n && m<=toAdd) {
+				x[i] = l1 + m; ++num;  // last part;
 				//found = true;
 				for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];
 				if (num == nsols) break; // goto end;
 			
-				if (i<n && toAdd>1) { // possible to increase # of parts?
+				if (i<n && m>1) { // possible to increase # of parts?
 								  // if so, do it;
 								  // but after this, no way to extend it w/o affecting decreasing order -- have to backtrack then.
 					// note that this never decrease ss: 
@@ -296,7 +296,7 @@ SEXP RJa0ss(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP ssR, SEXP numR, SEXP outR
 					//		(l1+toAdd)^2 + l1^2; 
 					// new sum of squares at these 2 locations is 
 					//		(l1+toAdd-1)^2 + (l1+1)^2 = (original ss) -2*(toAdd-1).
-					ss += 2*x[i]-1; // ss=ss+x[i]^2-(x[i]-1)^2
+					ss -= (x[i]-1)*(x[i]-1); // ss=ss+x[i]^2-(x[i]-1)^2
 					m = 1; --x[i++]; x[i] = l1 + 1; 
 					++num;
 					for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];

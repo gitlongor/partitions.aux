@@ -13,6 +13,6 @@ Imports:
     gmp
 #Biarch: yes
 RoxygenNote: 5.0.1
-Collation: 
-	partitions.R,
-	RJaSS.R
+Collate: 
+	"partitions.R"
+	"RJaSS.R"
