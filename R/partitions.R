@@ -294,6 +294,7 @@ restrictedpartitionZS1=function(n, k=n, upper=n)
 	startx=out[,1L]
 	startx=sort(startx[startx>0], decreasing=TRUE)
 	min1st = as.integer(ceiling(n/k))
+	startx; min1st
 	tmpans2=.Call(ZS1,
 		as.integer(n), startx, as.integer(k),
 		out, ncol.out, min1st
@@ -315,11 +316,12 @@ restrictedpartitionRJa=function(n, k=n, lower=0L, upper=n, distinct=FALSE)
 	n=as.integer(k)
 	out=matrix(NA_integer_, k, num)
 	
+	m; l1; l2; n; num; out;
 	tmpans=.Call(if(distinct) RJa1 else RJa0, m, l1, l2, n, num, out)
 	if(isTRUE(tmpans)) out else tmpans
 }
 
-restrictedpartitionRJb=function(n, k=n, values=0:n, max.multiplicity = rep(n, length(values)))
+restrictedpartitionRJb=function(n, k=n, values=0:n, max.multiplicity = rep(k, length(values)))
 {
 	num=as.integer(nparts.atmost.ubound(n,k,max(values)))
 	r=max(c(length(values), length(max.multiplicity)))
@@ -329,6 +331,7 @@ restrictedpartitionRJb=function(n, k=n, values=0:n, max.multiplicity = rep(n, le
 	n=as.integer(k)
 	out=matrix(NA_integer_, k, num)
 	
+	mu; m; values; n; num; out;
 	tmpans=.Call(RJb, mu, m, values, n, num, out)
 	if(isTRUE(tmpans)) out else tmpans
 }
