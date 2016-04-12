@@ -38,7 +38,10 @@ SEXP RJa0(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP numR, SEXP outR)
 		i=1; // l2 -= z*(n-1);
 		do{
 //a1:
-			while (m > l2) m -= (x[i++] = l1 + l2); // keep alloc upper bnd;
+			while (m > l2) {
+				m -= l2; 
+				x[i++] = l1 + l2; // keep alloc upper bnd;
+			}
 			x[i] = l1 + m; ++num;  // last part;
 			for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];
 			if (num == nsols) break; // goto end;
