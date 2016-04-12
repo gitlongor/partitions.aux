@@ -230,6 +230,7 @@ restrictedpartitionNRC=function(n, k=n, values=seq_len(n))
 	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
 	nsol=0L
 	ncol.out=ncol(out)
+	if(ncol.out==0L) return(out)
 
 	nextval=c(values[-1L],0L)
 	diffvals=values-nextval
@@ -268,6 +269,7 @@ restrictedpartitionZS1=function(n, k=n, upper=n)
 	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
 	nsol=0L
 	ncol.out=ncol(out)
+	if(ncol.out==0L) return(out)
 
 	nextval=c(values[-1L],0L)
 	diffvals=values-nextval
@@ -304,6 +306,19 @@ restrictedpartitionZS1=function(n, k=n, upper=n)
 #restrictedpartitionNR(15, 10, 1:7)
 #system.time(restrictedpartitionNR(80, 18, 1:9))
 
+restrictedpartitionRJa=function(n, k=n, lower=0L, upper=n, distinct=FALSE)
+{
+	num=as.integer(nparts.atmost.ubound(n,k,upper))
+	z=if(distinct) 1L else 0L
+	m=as.integer(n);
+	l1=as.integer(lower)
+	l2=as.integer(upper)
+	n=as.integer(k)
+	out=matrix(NA_integer_, k, num)
+	
+	tmpans=.Call(RJa, z, m, l1, l2, n, num, out)
+	if(isTRUE(tmpans)) out else tmpans
+}
 
 if(FALSE){
 	## pre-compute a large nparts.atmost table (0<=n<=1000; 0<=k<=1000)

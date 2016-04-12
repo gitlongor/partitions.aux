@@ -17,7 +17,7 @@ extern "C" {
 		int *x0; x0=INTEGER(startxR);
 		int *out; out=INTEGER(outR);
 		unsigned int nsols; nsols=(unsigned int)*INTEGER(nsolsR);
-		int min1st; min1st=*INTEGER(min1stR);
+		unsigned int min1st; min1st=(unsigned int)*INTEGER(min1stR);
 		unsigned int nsol;
 		unsigned int * x;
 		x = new unsigned int[n+1];
