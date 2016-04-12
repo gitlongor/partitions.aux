@@ -309,14 +309,13 @@ restrictedpartitionZS1=function(n, k=n, upper=n)
 restrictedpartitionRJa=function(n, k=n, lower=0L, upper=n, distinct=FALSE)
 {
 	num=as.integer(nparts.atmost.ubound(n,k,upper))
-	z=if(distinct) 1L else 0L
 	m=as.integer(n);
 	l1=as.integer(lower)
 	l2=as.integer(upper)
 	n=as.integer(k)
 	out=matrix(NA_integer_, k, num)
 	
-	tmpans=.Call(RJa, z, m, l1, l2, n, num, out)
+	tmpans=.Call(if(distinct) RJa1 else RJa0, m, l1, l2, n, num, out)
 	if(isTRUE(tmpans)) out else tmpans
 }
 
