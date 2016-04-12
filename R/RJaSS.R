@@ -1,4 +1,4 @@
-RJa0ss=function(m, l1=0L, l2=m, n=m, ss=m*m)
+RJa0ssR=function(m, l1=0L, l2=m, n=m, ss=m*m)
 {
 	m0=m=as.integer(m);
 	l1=as.integer(l1); 
@@ -28,16 +28,16 @@ RJa0ss=function(m, l1=0L, l2=m, n=m, ss=m*m)
 				i=i+1L
 			}
 			##//bool found=false;
-			if (toAdd != 0L && i<=n && toAdd==m) {
-				x[i] = l1 + toAdd; num =num+1L;  ##// last part;
+			if (toAdd != 0L && i<=n && m<=toAdd) {
+				x[i] = l1 + m; num =num+1L;  ##// last part;
 				##//found = true;
-				#browser()
+				if(num==18L)browser()
 				if(sum(x)!=m0 || sum(x*x) >ss0) browser()
 				out[,num]=x
 				
 				if (num == nsols) break; ##// goto end;
 			
-				if (i<n && toAdd>1L) { #// possible to increase # of parts?
+				if (i<n && m>1L) { #// possible to increase # of parts?
 								  ##// if so, do it;
 								  #// but after this, no way to extend it w/o affecting decreasing order -- have to backtrack then.
 					##// note that this never decrease ss: 
@@ -50,6 +50,7 @@ RJa0ss=function(m, l1=0L, l2=m, n=m, ss=m*m)
 					if(ss!=ss0-sum(x[1:i]^2)) browser()
 					i=i+1L; x[i] = l1 + 1L; 
 					num = num + 1L;
+					if(num==18L)browser();
 					out[,num]=x;
 					#for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];
 					if (num == nsols) break; #//goto end;
@@ -83,4 +84,4 @@ RJa0ss=function(m, l1=0L, l2=m, n=m, ss=m*m)
 
 	out[,seq_len(num), drop=FALSE]
 }
-str(RJa0ss(75,n=10,ss=1000))
+str(RJa0ssR(75,n=10,ss=1000))
