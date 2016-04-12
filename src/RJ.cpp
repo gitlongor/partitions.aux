@@ -31,29 +31,33 @@ SEXP RJa0(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP numR, SEXP outR)
 	x=new int[n+1]; 
 	//y=new int[n+1]; 
 	
-	num = 0; m -= n * l1 ; l2 -= l1;
+	num = 0; m -= n * l1 ; l2 -= l1;  // diff bounds
 	if (m>=0 && m <= n*l2 ){
-		for(i=1; i<=n; ++i) x[i] = l1;
+		for(i=1; i<=n; ++i) x[i] = l1; // init lower bnd;
 		i=1; // l2 -= z*(n-1);
 		do{
 //a1:			
-			while (m > l2) m -= (x[i++] = l2);
-			x[i] = m; ++num; 
+			while (m > l2) m -= (x[i++] = l2); // keep alloc upper bnd; 
+			x[i] = m; ++num;  // last part; 
 			for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp]; 
 			if (num == nsols) break; // goto end;
-			if (i<n && m>1) {
+			
+			if (i<n && m>1) { // possible to increase # of parts? 
+							  // if so, do it; 
+							  // but after this, no way to extend it; 
+							  // have to backtrack. 
 				m = 1; --x[i++]; x[i] = 1; 
 				++num; 
 				for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp]; 
 				if (num == nsols) break; //goto end;
 			} 
-			for (j=i-1; j>=1; --j) {
-				l2 = x[j] - 1; ++m;
-				if (m <= (n-j) * l2) {
-					x[j] = l2;
+			for (j=i-1; j>=1; --j) { // backtracking
+				l2 = x[j] - 1; ++m;  // go back to location j and consider the next smaller value; 
+				if (m <= (n-j) * l2) { // setting all >j locations to current save value as reduced x[j], can we get a solution? 
+					x[j] = l2;  
 					break; // goto a1;
-				}else{
-					m += l2; x[i] = 0; i = j; // at end: i=1
+				}else{  // otherwise, keep going back
+					m += l2; x[i] = 0; i = j; // i always points to j's next location.  At the end: i=1.
 				}
 			}
 		}while(i>1);
