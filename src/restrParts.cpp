@@ -72,7 +72,8 @@ extern "C" {
 				for(unsigned int j=1; j<=lev; ++j)
 					for(int i=0; i<ct[j]; ++i)
 						*(out++)=values[j];
-				for(int j=0; j<ctallow[lev]; ++j) *(out++)=0;
+				// for(int j=0; j<ctallow[lev]; ++j) *(out++)=0; // for the case when outR initialized to NA_integer_; 
+				out += ctallow[lev]; // for the case when outR initialized to 0;
 				if(nsol == nsols) break;
 //				Rprintf("nsol=%d\n", nsol);
 			}else if(lev < nvals){

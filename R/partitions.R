@@ -227,7 +227,7 @@ restrictedpartitionNRC=function(n, k=n, values=seq_len(n))
 	values=c(0L, sort(unique(as.integer(values[values>0 & values<=n])), decreasing=TRUE))
 	nvals=length(values)
 	maxv=max(values)
-	out=matrix(NA_integer_, k, as.numeric(nparts.atmost.ubound(n,k,maxv)))
+	out=matrix(0L, k, as.numeric(nparts.atmost.ubound(n,k,maxv))) # save time on writing 0's later in C
 	nsol=0L
 	ncol.out=ncol(out)
 	if(ncol.out==0L) return(out)
