@@ -5,7 +5,7 @@ export(
 	restrictedpartition, 
 	restrictedpartitionR, restrictedpartitionNR, restrictedpartitionNRC,
 	restrictedpartitionZS1,
-	restrictedpartitionRJa
+	restrictedpartitionRJa, restrictedpartitionRJb
 )
 
 useDynLib(partitions.aux, fpg=fxt_partition_gen, .registration=TRUE)

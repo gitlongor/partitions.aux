@@ -10,6 +10,8 @@
 	extern SEXP ZS1(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 	extern SEXP RJa0(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 	extern SEXP RJa1(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+	extern SEXP RJb(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
 //	extern int initHash(void);
 
 
@@ -19,6 +21,7 @@ static R_CallMethodDef callMethods[]  = {
   {"ZS1", (DL_FUNC) ZS1, 6},
   {"RJa0", (DL_FUNC) RJa0, 6},
   {"RJa1", (DL_FUNC) RJa1, 6},
+  {"RJb", (DL_FUNC) RJb, 6},
 //  {"dbl_dig", (DL_FUNC) &dbl_dig, 0},
   {NULL, NULL, 0}
 };

@@ -319,6 +319,20 @@ restrictedpartitionRJa=function(n, k=n, lower=0L, upper=n, distinct=FALSE)
 	if(isTRUE(tmpans)) out else tmpans
 }
 
+restrictedpartitionRJb=function(n, k=n, values=0:n, max.multiplicity = rep(n, length(values)))
+{
+	num=as.integer(nparts.atmost.ubound(n,k,max(values)))
+	r=max(c(length(values), length(max.multiplicity)))
+	mu=rep(as.integer(max.multiplicity), length=r)
+	m=as.integer(n);
+	v=rep(as.integer(values), length=r)
+	n=as.integer(k)
+	out=matrix(NA_integer_, k, num)
+	
+	tmpans=.Call(RJb, mu, m, values, n, num, out)
+	if(isTRUE(tmpans)) out else tmpans
+}
+
 if(FALSE){
 	## pre-compute a large nparts.atmost table (0<=n<=1000; 0<=k<=1000)
 	library(gmp)
