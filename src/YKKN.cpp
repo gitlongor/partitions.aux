@@ -118,6 +118,7 @@ class ykkn {
 			out_ += k;
 		}
 		void findAllChildren1();
+		void findAllChildren1Stack();
 		void findAllChildren2(int depth);
 		int * allParts1(int * out);
 		int * allParts2(int * out);
@@ -152,7 +153,7 @@ class ykkn {
 };
 
 void ykkn::findAllChildren1()
-{
+{// algorithm 1 based on recursion
 	R_CheckUserInterrupt();
 	output();
 	if (x[0] > x[1]){
@@ -166,6 +167,35 @@ void ykkn::findAllChildren1()
 				INVAM
 		}
 	}
+}
+
+void ykkn::findAllChildren1Stack()
+{// algorithm 1 based on manual stack management
+	bool * stack = new bool[k];
+	unsigned int depth = 0;
+start:	
+	R_CheckUserInterrupt();
+	output();
+	if (x[0] > x[1]){
+		AMPLUS1
+		stack[depth++] = true ;
+		goto start; //findAllChildren1();
+backTrue:
+		INVAMPLUS1
+		if (x[m-1] > x[m] &&
+			(m>1 || x[m-1] - x[m] > 1)) {
+				AM
+				stack[depth++] = false;
+				goto start; //findAllChildren1();
+backFalse:
+				INVAM
+		}
+	}
+	if (depth==0) {
+		delete[] stack;
+		return;
+	}
+	if (stack[--depth]) goto backTrue; else goto backFalse;
 }
 
 void ykkn::findAllChildren2(int depth)
@@ -196,7 +226,8 @@ int * ykkn::allParts1(int * out)
 	x[0]=n-1;
 	x[1]=1;
 	m=1;
-	findAllChildren1();
+	//findAllChildren1();
+	findAllChildren1Stack();
 	return out_;
 }
 int * ykkn::allParts2(int * out)
