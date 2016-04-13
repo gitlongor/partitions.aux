@@ -12,7 +12,7 @@
 	extern SEXP RJa1(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 	extern SEXP RJb(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 	extern SEXP RJa0ss(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-	extern SEXP ykknAllParts1(SEXP, SEXP);
+	extern SEXP ykknAllParts(SEXP, SEXP);
 
 //	extern int initHash(void);
 
@@ -25,7 +25,7 @@ static R_CallMethodDef callMethods[]  = {
   {"RJa1", (DL_FUNC) RJa1, 6},
   {"RJb", (DL_FUNC) RJb, 6},
   {"RJa0ss", (DL_FUNC) RJa0ss, 7},
-  {"ykknAllParts1", (DL_FUNC) ykknAllParts1, 2},
+  {"ykknAllParts", (DL_FUNC) ykknAllParts, 3},
 //  {"dbl_dig", (DL_FUNC) &dbl_dig, 0},
   {NULL, NULL, 0}
 };

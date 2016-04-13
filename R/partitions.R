@@ -354,12 +354,13 @@ restrictedpartitionRJaSS=function(n, k=n, lower=0L, upper=n, sum.square.upper=n*
 
 partsYKKN=function(n, method=1)
 {
-	stopifnot(method==1)
+	method=as.integer(method)
+	stopifnot(method==1L || method==2L)
 	n=as.integer(n);
 	out=matrix(0L, n, partitions::P(n));
 
-	n; out
-	tmpans=.Call(ykknAllParts1, n, out);
+	n; out; method
+	tmpans=.Call(ykknAllParts, n, out, method);
 	if(isTRUE(tmpans)) out else browser()
 }
 

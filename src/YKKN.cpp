@@ -4,6 +4,8 @@
 #include <Rinternals.h>
 #include <R_ext/Utils.h>
 
+#ifdef NOTHING
+// this is the initial O(n^2) storage version of the algorithm;
 class ykkn {
 	public:
 		int * * x; // current status;
@@ -14,15 +16,10 @@ class ykkn {
 
 		int * output (int row, int * out, bool pad0=false) const
 		{
-			int * thisRow = x[row];
-			int i;
-			for(i=0; i<=m[row]; ++i) {
-				*(out++)=thisRow[i];
-//				Rprintf("%d ", thisRow[i]);
-			}
-//			Rprintf("\n");
-			if (pad0) for(; i<k; ++i) *(out++)=0;
-			return (out);
+			int mp1 = m[row]+1;
+			memcpy(out, x[row], sizeof(int)*mp1);
+			if (pad0) memset(out + mp1, 0, sizeof(int) * (k-mp1));
+			return out + k;
 		}
 		int * findAllChildren1(int row, int * out);
 		int * allParts1(int * out);
@@ -73,7 +70,7 @@ class ykkn {
 int * ykkn::findAllChildren1(int row, int * out)
 {
 	R_CheckUserInterrupt();
-	out = output (row, out, false);
+	out = output (row, out);
 	if (x[row][0] > x[row][1]){
 		AmPlus1(row);
 //Rprintf("m[%d]=%d\n", row, m[row]);
@@ -97,19 +94,137 @@ int * ykkn::allParts1(int * out)
 	x[1][0]=n-1;
 	x[1][1]=1;
 	m[1]=1;
-	out = output(0, out, false);
+	out = output(0, out);
 	out = findAllChildren1(1, out);
 	return out;
 }
 
+#else
+
+// this is the O(n) storage version; 
+class ykkn {
+	public:
+		int * x; // current status;
+		int k;   // number of allowed parts;
+		int n;	 // number to be partitioned;
+		int m; 	 // number of parts in the current partition;
+		//int * out;
+
+		inline void output (bool pad0=false) 
+		{
+			int mp1 = m+1;
+			memcpy(out_, x, sizeof(int)*mp1);
+			if (pad0) memset(out_ + mp1, 0, sizeof(int) * (k-mp1));
+			out_ += k;
+		}
+		void findAllChildren1();
+		void findAllChildren2(int depth);
+		int * allParts1(int * out);
+		int * allParts2(int * out);
+
+		ykkn (int nvalue)
+		{
+			ykkn_(nvalue, nvalue);
+		}
+		ykkn (int nvalue, int kvalue)
+		{
+			ykkn_(nvalue, kvalue);
+		}
+		void ykkn_ (int nvalue, int kvalue)
+		{
+			n = nvalue;
+			k = kvalue;
+			x = new int[k];
+			
+			x[0]=n;
+			m=0;
+		}
+		~ykkn ()
+		{
+			delete[] x;
+		}
+	private:
+		int * out_;
+		#define AMPLUS1 --x[0]; x[++m]=1;
+		#define AM --x[0]; ++x[m];
+		#define INVAMPLUS1 ++x[0]; x[m--]=0;
+		#define INVAM ++x[0]; --x[m];
+};
+
+void ykkn::findAllChildren1()
+{
+	R_CheckUserInterrupt();
+	output();
+	if (x[0] > x[1]){
+		AMPLUS1
+		findAllChildren1();
+		INVAMPLUS1
+		if (x[m-1] > x[m] &&
+			(m>1 || x[m-1] - x[m] > 1)) {
+				AM
+				findAllChildren1();
+				INVAM
+		}
+	}
+}
+
+void ykkn::findAllChildren2(int depth)
+{
+	R_CheckUserInterrupt();
+	bool even = (depth % 2 == 0);
+	if (even) output();
+	if (x[0] > x[1]){
+		AMPLUS1
+		findAllChildren2(depth+1);
+		INVAMPLUS1
+		if (x[m-1] > x[m] &&
+			(m>1 || x[m-1] - x[m] > 1)) {
+				AM
+				findAllChildren2(depth + 1);
+				INVAM
+		}
+	}
+	if (!even) output();
+}
+
+int * ykkn::allParts1(int * out)
+{
+	out_ = out;
+	x[0]=n;
+	m=0;
+	output (); 
+	x[0]=n-1;
+	x[1]=1;
+	m=1;
+	findAllChildren1();
+	return out_;
+}
+int * ykkn::allParts2(int * out)
+{
+	out_ = out;
+	x[0]=n;
+	m=0;
+	output (); 
+	x[0]=n-1;
+	x[1]=1;
+	m=1;
+	findAllChildren2(1);
+	return out_;
+}
+
+	
+#endif
+
 extern "C" {
 
-SEXP ykknAllParts1(SEXP nR, SEXP outR)
+SEXP ykknAllParts(SEXP nR, SEXP outR, SEXP methodR)
 {
 	int * out = INTEGER(outR);
 	int n = *INTEGER(nR);
 	ykkn ykknTree(n);
-	int * out0 = ykknTree.allParts1(out);
+	int * out0; 
+	out0 =  (*INTEGER(methodR) == 1) ? ykknTree.allParts1(out) : ykknTree.allParts2(out) ;
+	
 	SEXP ans=PROTECT(allocVector(LGLSXP, 1));
 	LOGICAL(ans)[0] = out0 > out ? 1 : 0;
 	UNPROTECT(1);
