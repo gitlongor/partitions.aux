@@ -317,7 +317,8 @@ restrictedpartitionRJa=function(n, k=n, lower=0L, upper=n, distinct=FALSE)
 	out=matrix(NA_integer_, k, num)
 	
 	m; l1; l2; n; num; out;
-	tmpans=.Call(if(distinct) RJa1 else RJa0, m, l1, l2, n, num, out)
+	tmpans= if(distinct) .Call(RJa1 , m, l1, l2, n, num, out) else 
+	.Call(RJa0 , m, l1, l2, n, num, out)
 	if(isTRUE(tmpans)) out else tmpans
 }
 
