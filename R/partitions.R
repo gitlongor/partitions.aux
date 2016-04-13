@@ -352,6 +352,17 @@ restrictedpartitionRJaSS=function(n, k=n, lower=0L, upper=n, sum.square.upper=n*
 	if(isTRUE(tmpans)) out else tmpans
 }
 
+partsYKKN=function(n, method=1)
+{
+	stopifnot(method==1)
+	n=as.integer(n);
+	out=matrix(0L, n, partitions::P(n));
+
+	n; out
+	tmpans=.Call(ykknAllParts1, n, out);
+	if(isTRUE(tmpans)) out else browser()
+}
+
 if(FALSE){
 	## pre-compute a large nparts.atmost table (0<=n<=1000; 0<=k<=1000)
 	library(gmp)
