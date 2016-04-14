@@ -50,7 +50,7 @@ restrictedpartitionR=function(n, k=n, values=seq_len(n))
 	recur.fctn(2L)
 	out
 }
-restrictedpartitionR(15, 10, 1:7)
+#restrictedpartitionR(15, 10, 1:7)
 
 
 restrictedpartitionNR=function(n, k=n, values=seq_len(n))

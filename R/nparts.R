@@ -50,56 +50,43 @@ nparts.exact = function(n, k, include.zero=FALSE)
 	as.character(recur.fctn(n,k))
 }
 
-nparts.atmost.ubound = function(n, k, upper)
+nparts.atmost.ubound = function(n, k, upper, include.zero=TRUE)
 {## this computes the number of restricted partitions of n into at most k parts
  ## subject to the constraint that each part is at most "upper"
  ## reference: https://en.wikipedia.org/wiki/Partition_(number_theory)
+ #	Andrews. (1998) The Theory of Partitions. CUP. Eqns (3.2.4), (3.2.6), (3.5.3), (3.5.4)
+	if(!include.zero) return(Recall(n-k, k, upper-1L))
 
-	pkn.table = matrix(NA_character_, n+1L, k+1L)
-	pkn.table[, 2L] = '1'
-	pkn.table[, 1L] = '0'
-	pkn.table[1L, ] = '1'  # overwrite (1,1) position correctly
-
-	recur.fctn = function(n, k, upper)
-	{
-		if(n < 0L) n = 0L
-		if(upper < 0L || (n>0L && upper * k < n)) return(0L)
-		if(upper == 0L) return( n==0L )
-		if(upper >= n) return(as.bigz(nparts.atmost(n, k, include.zero=TRUE)))
-		#if(!is.na(tmpans <- pkn.table[n+1L, k+1L])) return(as.bigz(tmpans))
-		ans = Recall(n, k-1L, upper) + Recall(n-k, k, upper-1L)
-		#pkn.table[n+1L, k+1L] <<- as.character(ans)
-		ans
+	if (k < upper) {tmp=k; k=upper; upper=tmp} #(3.5.3)
+	n = min(upper*k-n , n) #(3.5.4)
+	dims=pmax(rep(1L,3), c(n,k,upper)+1L)
+	pkn.table = array(NA_character_, dim=dims)
+	pkn.table[ , , 1L] = '0'
+	pkn.table[1L, , ] = '1'
+	if(k>=1L){
+		tmp = matrix('1', dims[1], dims[3])
+		tmp[lower.tri(tmp)]='0'
+		pkn.table[, 2L, ] = tmp
 	}
-	as.character(recur.fctn(n,k,upper))
-}
-
-
-
-nparts.atmost.ubound = function(n, k, upper)
-{## this computes the number of restricted partitions of n into at most k parts
- ## subject to the constraint that each part is at most "upper"
- ## reference: https://en.wikipedia.org/wiki/Partition_(number_theory)
-
-	pkn.table = array(NA_character_, dim=c(n+1L, k+1L, upper+1L))
-	#pkn.table[, 2L] = '1'
-	#pkn.table[, 1L] = '0'
-	#pkn.table[1L, ] = '1'  # overwrite (1,1) position correctly
-
+	
 	recur.fctn = function(n, k, upper)
 	{
-		if(n < 0L) return(0L) #?
-		if(n==0L) {
-			if(k==0L && upper>=0L) return(1L) else
-			if(k>0) return(upper>=0L) else
-			return(0L)
+		## these two switches help to reduced the number of recursive calls
+		if (k < upper) {tmp=k; k=upper; upper=tmp} #(3.5.3)
+		n = min(upper*k-n , n) #(3.5.4)
+
+		if(n < 0L ) return(0L) 
+
+		if(!is.na(tmpans <- pkn.table[n+1L, k+1L, upper+1L]))
+			return(as.bigz(tmpans))
+
+		ans = if(upper>n){
+			Recall(n, k, n)
+		}else if (k>n) {
+			Recall(n,n,upper) 
+		}else {
+			Recall(n, k-1L, upper) + Recall(n-k, k, upper-1L)
 		}
-		if(k==1L) return(upper>=n)
-		if(upper < 0L || (n>0L && upper * k < n)) return(0L)
-		if(upper == 0L) return( n==0L )
-		if(upper >= n) return(as.bigz(nparts.atmost(n, k, include.zero=TRUE)))
-		if(!is.na(tmpans <- pkn.table[n+1L, k+1L, upper+1L])) return(as.bigz(tmpans))
-		ans = if(k>n) Recall(n,n,upper) else Recall(n, k-1L, upper) + Recall(n-k, k, upper-1L)
 		pkn.table[n+1L, k+1L, upper+1L] <<- as.character(ans)
 		ans
 	}
