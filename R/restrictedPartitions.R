@@ -1,6 +1,6 @@
 
 
-restrictedpartition=function(n, k=n, values=seq_len(n))
+restrictedpartitionFXT=function(n, k=n, values=seq_len(n))
 {
 
 	values=sort.int(unique(as.integer(values)), decreasing=FALSE);
@@ -250,14 +250,27 @@ restrictedpartitionRJaSS=function(n, k=n, lower=0L, upper=n, sum.square.upper=n*
 	if(isTRUE(tmpans)) out else tmpans
 }
 
-partsYKKN=function(n, method=1)
+partsYKKN=function(n, worstCaseO1=FALSE)
 {
-	method=as.integer(method)
-	stopifnot(method==1L || method==2L)
+	worstCaseO1=as.logical(worstCaseO1)
+	#stopifnot(method==1L || method==2L)
 	n=as.integer(n);
 	out=matrix(0L, n, partitions::P(n));
 
-	n; out; method
-	tmpans=.Call(ykknAllParts, n, out, method);
+	n; out; worstCaseO1
+	tmpans=.Call(ykknAllParts, n, out, worstCaseO1);
+	if(isTRUE(tmpans)) out else browser()
+}
+
+restrictedpartsYKKN=function(n, k, worstCaseO1=FALSE)
+{
+	worstCaseO1=as.logical(worstCaseO1)
+	#stopifnot(method==1L || method==2L)
+	n=as.integer(n);
+	k=min(n, as.integer(k))
+	out=matrix(0L, k, as.integer(nparts.atmost(n,k)));
+
+	n; k; out; worstCaseO1
+	tmpans=.Call(ykknAtMostKParts, n, k, out, worstCaseO1);
 	if(isTRUE(tmpans)) out else browser()
 }

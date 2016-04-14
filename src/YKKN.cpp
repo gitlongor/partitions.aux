@@ -120,8 +120,10 @@ class ykkn {
 		void findAllChildren1();
 		void findAllChildren1Stack();
 		void findAllChildren2(int depth);
-		int * allParts1(int * out);
-		int * allParts2(int * out);
+		void findAllChildren3();
+		void findAllChildren3(int depth);
+		int * allParts(int * out, const bool worstCaseO1=false, const bool recursive=false);
+		int * atMostKParts(int * out, const bool worstCaseO1=false, const bool recursive=false);
 
 		ykkn (int nvalue)
 		{
@@ -217,20 +219,46 @@ void ykkn::findAllChildren2(int depth)
 	if (!even) output();
 }
 
-int * ykkn::allParts1(int * out)
-{
-	out_ = out;
-	x[0]=n;
-	m=0;
-	output (); 
-	x[0]=n-1;
-	x[1]=1;
-	m=1;
-	//findAllChildren1();
-	findAllChildren1Stack();
-	return out_;
+void ykkn::findAllChildren3()
+{// algorithm 3 based on recursion
+	R_CheckUserInterrupt();
+	output();
+	if (x[0] > x[1]){
+		if (m + 1 < k){
+			AMPLUS1
+			findAllChildren3();
+			INVAMPLUS1
+		}
+		if (x[m-1] > x[m] &&
+			(m>1 || x[m-1] - x[m] > 1)) {
+				AM
+				findAllChildren3();
+				INVAM
+		}
+	}
 }
-int * ykkn::allParts2(int * out)
+void ykkn::findAllChildren3(int depth)
+{// algorithm 3 based on recursion
+	R_CheckUserInterrupt();
+	bool even = (depth % 2 == 0);
+	if (even) output();
+	if (x[0] > x[1]){
+		if (m + 1 < k){
+			AMPLUS1
+			findAllChildren3();
+			INVAMPLUS1
+		}
+		if (x[m-1] > x[m] &&
+			(m>1 || x[m-1] - x[m] > 1)) {
+				AM
+				findAllChildren3();
+				INVAM
+		}
+	}
+	if (!even) output();
+}
+
+int * ykkn::allParts(int * out, const bool worstCaseO1, const bool recursive)
 {
 	out_ = out;
 	x[0]=n;
@@ -239,22 +267,39 @@ int * ykkn::allParts2(int * out)
 	x[0]=n-1;
 	x[1]=1;
 	m=1;
-	findAllChildren2(1);
+	if (worstCaseO1) findAllChildren2(1); 
+	else if (recursive)  findAllChildren1();
+	else findAllChildren1Stack();
 	return out_;
 }
 
-	
+int * ykkn::atMostKParts(int * out, const bool worstCaseO1, const bool recursive)
+{
+	out_ = out;
+	x[0]=n;
+	m=0;
+	output (); 
+	if(k==1) return out_;
+	x[0]=n-1;
+	x[1]=1;
+	m=1;
+	if (worstCaseO1) findAllChildren3(1); 
+	else if (recursive)  findAllChildren3();
+	else findAllChildren3();  // not yet implemented
+	return out_;
+}
+
 #endif
 
 extern "C" {
 
-SEXP ykknAllParts(SEXP nR, SEXP outR, SEXP methodR)
+SEXP ykknAllParts(SEXP nR, SEXP outR, SEXP worstCaseO1R)
 {
 	int * out = INTEGER(outR);
 	int n = *INTEGER(nR);
 	ykkn ykknTree(n);
 	int * out0; 
-	out0 =  (*INTEGER(methodR) == 1) ? ykknTree.allParts1(out) : ykknTree.allParts2(out) ;
+	out0 =  (*LOGICAL(worstCaseO1R) == 0) ? ykknTree.allParts(out) : ykknTree.allParts(out,true) ;
 	
 	SEXP ans=PROTECT(allocVector(LGLSXP, 1));
 	LOGICAL(ans)[0] = out0 > out ? 1 : 0;
@@ -262,4 +307,18 @@ SEXP ykknAllParts(SEXP nR, SEXP outR, SEXP methodR)
 	return ans;
 }
 
+SEXP ykknAtMostKParts(SEXP nR, SEXP kR, SEXP outR, SEXP worstCaseO1R)
+{
+	int * out = INTEGER(outR);
+	int n = *INTEGER(nR);
+	int k = *INTEGER(kR);
+	ykkn ykknTree(n, k);
+	int * out0; 
+	out0 =  (*LOGICAL(worstCaseO1R) == 0) ? ykknTree.atMostKParts(out) : ykknTree.atMostKParts(out,true) ;
+	
+	SEXP ans=PROTECT(allocVector(LGLSXP, 1));
+	LOGICAL(ans)[0] = out0 > out ? 1 : 0;
+	UNPROTECT(1);
+	return ans;
+}
 }

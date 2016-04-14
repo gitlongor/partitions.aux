@@ -3,12 +3,12 @@ importFrom(partitions, P)
 
 export(nparts.atmost, nparts.atmost.ubound, nparts.exact)
 export(
-	restrictedpartition, 
+	restrictedpartitionFXT, 
 	restrictedpartitionR, restrictedpartitionNR, restrictedpartitionNRC,
 	restrictedpartitionZS1,
 	restrictedpartitionRJa, restrictedpartitionRJb, 
 	restrictedpartitionRJaSS, 
-	partsYKKN
+	partsYKKN, restrictedpartsYKKN
 )
 
 useDynLib(partitions.aux, fpg=fxt_partition_gen, .registration=TRUE)
