@@ -5,8 +5,9 @@
 #include <R_ext/Utils.h>
 
 
-extern int isqrt(int); 
+#include "integer_arith.h"
 #define MIN(x,y)  ((x)>(y) ? (y) : (x))
+
 
 extern "C" {
 
@@ -268,23 +269,20 @@ SEXP RJa0ss(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP ssR, SEXP numR, SEXP outR
 
 	num = 0; m -= n * l1 ; l2 -= l1;  // diff bounds
 	ss -= n * l1sq; 
-	if (m>=0 && m <= n*l2 && ss>=0 && ss <= n * l2 * l2){
+	if (m>=0 && m <= n*l2 && ss>=0){
 		for(i=1; i<=n; ++i) x[i] = l1; // init lower bnd;
 		
 		i=1; // l2 -= z*(n-1);
 		do{
-//a1:
+a1:
 			// keep allocating current allowed upper bound
 			while (m > (toAdd = MIN(l2, isqrt(l1sq+ss)-l1)) && toAdd > 0 && i<n) 
 			{// toAdd holds allowed upper bound
-			//while (ss >= (l2sq = l2 * (l2 + 2 * l1)) && m > l2)
 				m -= toAdd; ss -= toAdd * ( toAdd + l12); 
 				x[i++] = l1 + toAdd; 
 			}
-			//bool found=false;
 			if (toAdd != 0 && i<=n && m<=toAdd) {
 				x[i] = l1 + m; ++num;  // last part;
-				//found = true;
 				for(int tmp=1; tmp<=n; ++tmp) *(out++) = x[tmp];
 				if (num == nsols) break; // goto end;
 			
@@ -304,17 +302,31 @@ SEXP RJa0ss(SEXP mR, SEXP l1R, SEXP l2R, SEXP nR, SEXP ssR, SEXP numR, SEXP outR
 				}
 			}
 			for (j=i-1; j>=1; --j) { // backtracking
-				ss += 2*x[j] - 1; // ss + x[j]^2 - (x[j]-1)^2
-				l2 = x[j] - l1 - 1; ++m;  // go back to location j and consider the next smaller value;
-				if (m <= (n-j) * l2 // at most n-j full terms to allocate after location j
-				) { // is it possible for all >j locations to get a solution?
-					// this is not sufficient condition, but necessary.
-					x[j] = l1 + l2;
-					break; // goto a1;
-				}else{  // otherwise, keep going back
-					ss += (x[j]-1)*(x[j]-1) - l1sq; 
-					m += l2; x[i] = l1; i = j; // i always points to j's next location.  At the end: i=1.
-				}
+				// tentatively reduce x[j] 1-by-1 and check if there could be solutions: 
+				int n_j = n-j; 
+				int m0 = m; 
+				const int zUpper = x[j]-l1 - idiv_ceil(x[j]-l1+m0, n_j+1) ;
+				for(int z=1; z <= zUpper; ++z){
+					//further check ss: 
+					//if all x[i]..x[n] are assigned to values to minimize their sum of squares, will that exceed allowed ss? 
+					++m;
+					int k = m / n_j; int rem = m % n_j; 
+					if(m*(l12+k) + (k+1)*rem <= ss+2*z*x[j] - z*z) {
+						// both necessary conditions (m and ss) are met
+						ss += 2*z*x[j] - z*z; // ss + x[j]^2 - (x[j]-1)^2
+						x[j] -= z; 
+						l2 = x[j] - l1; 
+						goto a1;
+					}
+				} 
+				// decreasing x[j] is not possible, keep going back
+					x[i--]=l1; // i always points to j's next location.  At the end: i=1.
+					ss += x[i]*x[i] - l1sq; 
+					m = m0 + x[i] - l1; 
+				//}
+//Rprintf("j=%d i=%d\nx= ",j,i);
+//for(int tmp=1; tmp<=n; ++tmp) Rprintf("%d ", x[tmp]);
+//Rprintf("\n");
 			}
 		}while(i>1);
 	}

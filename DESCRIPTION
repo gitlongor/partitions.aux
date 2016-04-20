@@ -1,8 +1,8 @@
 Package: partitions.aux
 Type: Package
 Title: Auxiliary Functions to Partitioned Package
-Version: 0.1.0-20160414
-Author: Long Qu, Jorg Arndt
+Version: 0.1.0-20160420
+Author: Long Qu, Jorg Arndt, W. Riha, Leeds K. R. James, Katsuhisa Yamanaka, Shin-ichiro Kawano, Yosuke Kukuchi, Shin-ichi Nakano, Antoine Zoghbi, Ivan Stojmenovic
 Maintainer: Long Qu <long.qu@wright.edu>
 Description: More about what it does (maybe more than one line).
 License: GPL

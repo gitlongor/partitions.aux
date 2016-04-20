@@ -237,10 +237,12 @@ restrictedpartitionRJb=function(n, k=n, values=0:n, max.multiplicity = rep(k, le
 
 restrictedpartitionRJaSS=function(n, k=n, lower=0L, upper=n, sum.square.upper=n*n)
 {
-	num=as.integer(nparts.atmost.ubound(n,k,upper))
+	l2=as.integer(min(n, upper, (n+sqrt((k-1)*(k*sum.square.upper - n*n)))/k))
+	ii = floor(n/l2); 
+	if(sum.square.upper >= (ii+ii*ii)*l2*l2-2*ii*n*l2+n*n) return( restrictedpartitionRJa(n, k, lower, l2))
+	num=as.integer(nparts.atmost.ubound(n,k,l2))
 	m=as.integer(n);
 	l1=as.integer(lower)
-	l2=as.integer(upper)
 	n=as.integer(k)
 	ss=as.integer(sum.square.upper)
 	out=matrix(NA_integer_, k, num)

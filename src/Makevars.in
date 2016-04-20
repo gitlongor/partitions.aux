@@ -6,7 +6,7 @@ FXT_PREFIX = fxt
 
 ## from fxt/files.mk
 COMBOBJS = $(FXT_PREFIX)/src/comb/partition-gen.o 
-OBJS = $(COMBOBJS) init.o partitionGenFxt.o restrParts.o ZS1.o RJ.o isqrt.o YKKN.o
+OBJS = $(COMBOBJS) init.o partitionGenFxt.o restrParts.o ZS1.o RJ.o YKKN.o
 #SRC=$(OBJS:.o=.cc)
 
 ## R package

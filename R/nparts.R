@@ -53,7 +53,7 @@ nparts.exact = function(n, k, include.zero=FALSE)
 nparts.atmost.ubound = function(n, k, upper, include.zero=TRUE)
 {## this computes the number of restricted partitions of n into at most k parts
  ## subject to the constraint that each part is at most "upper"
- ## reference: https://en.wikipedia.org/wiki/Partition_(number_theory)
+ ## reference: 
  #	Andrews. (1998) The Theory of Partitions. CUP. Eqns (3.2.4), (3.2.6), (3.5.3), (3.5.4)
 	if(!include.zero) return(Recall(n-k, k, upper-1L))
 
