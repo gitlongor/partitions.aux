@@ -303,36 +303,31 @@ a1:
 			}
 			for (j=i-1; j>=1; --j) { // backtracking
 				// tentatively reduce x[j] 1-by-1 and check if there could be solutions: 
-				int n_j = n-j; 
-				int m0 = m; 
+				const int n_j = n-j; 
+				const int m0 = m; 
 				const int zUpper = x[j]-l1 - idiv_ceil(x[j]-l1+m0, n_j+1) ;
 				for(int z=1; z <= zUpper; ++z){
 					//further check ss: 
 					//if all x[i]..x[n] are assigned to values to minimize their sum of squares, will that exceed allowed ss? 
 					++m;
-					int k = m / n_j; int rem = m % n_j; 
+					const int k = m / n_j; const int rem = m % n_j; 
 					if(m*(l12+k) + (k+1)*rem <= ss+2*z*x[j] - z*z) {
 						// both necessary conditions (m and ss) are met
-						ss += 2*z*x[j] - z*z; // ss + x[j]^2 - (x[j]-1)^2
+						ss += 2*z*x[j] - z*z; // ss + x[j]^2 - (x[j]-z)^2
 						x[j] -= z; 
 						l2 = x[j] - l1; 
 						goto a1;
 					}
-				} 
+				}
 				// decreasing x[j] is not possible, keep going back
 					x[i--]=l1; // i always points to j's next location.  At the end: i=1.
 					ss += x[i]*x[i] - l1sq; 
 					m = m0 + x[i] - l1; 
-				//}
-//Rprintf("j=%d i=%d\nx= ",j,i);
-//for(int tmp=1; tmp<=n; ++tmp) Rprintf("%d ", x[tmp]);
-//Rprintf("\n");
 			}
 		}while(i>1);
 	}
 //end:
 	delete[] x;
-//	delete[] y;
 
 	if(num < nsols){
 		*INTEGER(numR) = num;
